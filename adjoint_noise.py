@@ -187,9 +187,47 @@ if __name__ == "__main__":
     outdir = os.path.join(script_dir, "images", "orig1")
     os.makedirs(outdir, exist_ok=True)
 
-    # ランダムな個数、ランダムな値を昇順で配列生成
-    #num_tobs = np.random.randint(1, nmax//2)  # 1以上 nmax//2 未満のランダムな個数
-    #tobs = np.sort(np.random.choice(np.arange(1, nmax), size=num_tobs, replace=False))
+    # 設定ファイルの読み込み（-f/--config）
+    parser = argparse.ArgumentParser(
+        description="adjoint method demo with optional JSON config",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument("-f", "--config", type=str, default=None, help="JSON設定ファイルのパス")
+    args = parser.parse_args()
+
+    cfg = {}
+    if args.config is not None:
+        config_path = args.config
+        # カレントで見つからなければスクリプトディレクトリを試す
+        if not os.path.isabs(config_path) and not os.path.exists(config_path):
+            alt_path = os.path.join(script_dir, config_path)
+            if os.path.exists(alt_path):
+                config_path = alt_path
+        with open(config_path, "r", encoding="utf-8") as f:
+            cfg = json.load(f)
+        # デフォルト値を上書き
+        dt = float(cfg.get("dt", dt))
+        nmax = int(cfg.get("nmax", nmax))
+        x1 = float(cfg.get("x1", x1))
+        y1 = float(cfg.get("y1", y1))
+        at = cfg.get("a", at)
+
+    # 観測時刻 tobs の設定（設定ファイルがあれば優先）
+    if "tobs" in cfg:
+        raw_tobs = cfg.get("tobs")
+        if isinstance(raw_tobs, list):
+            tobs = np.array(raw_tobs, dtype=int)
+        else:
+            tobs = np.array([int(raw_tobs)], dtype=int)
+        # 範囲外の値は除去
+        tobs = tobs[(tobs >= 0) & (tobs < nmax)]
+        if tobs.size == 0:
+            tobs = np.arange(1, nmax, 10)
+    else:
+        # ランダムな個数、ランダムな値を昇順で配列生成（必要なら復活）
+        # num_tobs = np.random.randint(1, nmax//2)
+        # tobs = np.sort(np.random.choice(np.arange(1, nmax), size=num_tobs, replace=False))
+        tobs = np.arange(1, nmax, 10)
     
     tobs = np.arange(1, nmax, 10)
 
