@@ -123,7 +123,7 @@ def main() -> None:
     plt.savefig(os.path.join(outdir, "final_xy.png"), dpi=dpi)
     plt.close()
 
-    # 2) 試行回数 × Final cost
+    # 2) ノイズ標準偏差 × Final cost
     plt.figure(figsize=(6, 4))
     plt.plot(ystds, costs, marker="o", linestyle="none")
     plt.xlabel("y_std")
@@ -134,7 +134,7 @@ def main() -> None:
     plt.savefig(os.path.join(outdir, "ystd_cost.png"), dpi=dpi)
     plt.close()
 
-    # 3) 試行回数 × Gradient norm
+    # 3) ノイズ標準偏差 × Gradient norm
     plt.figure(figsize=(6, 4))
     plt.plot(ystds, gnorms, marker="o", linestyle="none", color="black")
     plt.xlabel("y_std")
@@ -145,7 +145,7 @@ def main() -> None:
     plt.savefig(os.path.join(outdir, "ystd_gnorm.png"), dpi=dpi)
     plt.close()
 
-    # 4) 試行回数 × 最終反復回数
+    # 4) ノイズ標準偏差 × 最終反復回数
     plt.figure(figsize=(6, 6))
     plt.plot(ystds, iters, marker="o", linestyle="none", color="black")
     plt.xlabel("y_std")
